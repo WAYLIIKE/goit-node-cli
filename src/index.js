@@ -4,7 +4,9 @@ import {
   removeContact,
   addContact,
 } from './contacts.js';
+
 import { program } from 'commander';
+
 program
   .option('-a, --action <type>', 'choose action')
   .option('-i, --id <type>', 'user id')
