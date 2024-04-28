@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
-const contactsPath = path.join('db', 'contacts.json');
+const contactsPath = path.join('./db', 'contacts.json');
 
 // Returns contacts array.
 export async function listContacts() {
@@ -9,7 +9,7 @@ export async function listContacts() {
     const contacts = await fs.readFile(contactsPath);
     return JSON.parse(contacts);
   } catch (error) {
-    console.log(error);
+    return error;
   }
 }
 
@@ -20,7 +20,7 @@ export async function getContactById(contactId) {
     const isContact = contacts.find(item => item.id === contactId);
     return isContact || null;
   } catch (error) {
-    console.log(error);
+    return error;
   }
 }
 
@@ -28,22 +28,22 @@ export async function getContactById(contactId) {
 export async function removeContact(contactId) {
   try {
     const contacts = await listContacts();
-    const deletedContact = await getContactById(contactId);
+    const deletedContactIdx = contacts.findIndex(item => item.id === contactId);
 
-    if (deletedContact === null) return null;
+    if (deletedContactIdx === -1) return null;
 
-    const newContacts = contacts.filter(item => item.id !== contactId);
-    await fs.writeFile(contactsPath, JSON.stringify(newContacts));
+    const deletedContact = contacts.splice(deletedContactIdx, 1);
+    await fs.writeFile(contactsPath, JSON.stringify(contacts));
     return deletedContact;
   } catch (error) {
-    console.log(error);
+    return error;
   }
 }
 
 // Returns added contact object with ID.
 export async function addContact(name, email, phone) {
   if (!name || !email || !phone) {
-    return 'Enter all data';
+    throw new Error('Enter all data');
   }
 
   try {
@@ -58,6 +58,6 @@ export async function addContact(name, email, phone) {
     await fs.writeFile(contactsPath, JSON.stringify(newContactsArray));
     return newContact;
   } catch (error) {
-    console.log(error);
+    return error;
   }
 }
